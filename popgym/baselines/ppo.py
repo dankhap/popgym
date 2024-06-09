@@ -9,6 +9,7 @@ import ray
 import torch
 from ray.tune.registry import register_env  # noqa: F401
 
+
 import popgym  # noqa: F401
 from popgym import wrappers
 from popgym.baselines.ray_models.ray_diffnc import DiffNC  # noqa: F401
@@ -28,24 +29,39 @@ from popgym.baselines.ray_models.ray_mlp import MLP, BasicMLP
 from popgym.baselines.ray_models.ray_s4d import S4D
 from popgym.core.env import POPGymEnv
 
+# Defaults
+POPGYM_EXPERIMENT= "LunarLanderContinuousMaskVelocitiesMultiDiscreteMedium,LunarLanderContinuousMaskVelocitiesMultiDiscreteHard"
+# POPGYM_MODELS= "DeepLinearAttention"
+# POPGYM_MODELS= "GRU,Frameconv,Framestack"
+POPGYM_BPTT_CUTOFF = 1024
+POPGYM_MODELS= "Frameconv,Framestack"
+POPGYM_WORKERS= 1
+POPGYM_GPU= 1.00
+
+# OG Defaults
+# POPGYM_EXPERIMENT= "ALL"
+# POPGYM_MODELS= "ALL",
+# POPGYM_WORKERS= "4"
+# POPGYM_GPU= "0.25"
+# POPGYM_BPTT_CUTOFF = "1024"
 
 def main():
     env_names: List[Any] = []
 
-    env_types = os.environ.get("POPGYM_EXPERIMENT", "ALL")
-    desired_models = os.environ.get("POPGYM_MODELS", "ALL")
+    env_types = os.environ.get("POPGYM_EXPERIMENT", POPGYM_EXPERIMENT)
+    desired_models = os.environ.get("POPGYM_MODELS", POPGYM_MODELS)
     num_splits = int(os.environ.get("POPGYM_NUM_SPLITS", 1))
     split_id = int(os.environ.get("POPGYM_SPLIT_ID", 0))
     project_id = os.environ.get("POPGYM_PROJECT", "popgym-debug")
-    gpu_per_worker = float(os.environ.get("POPGYM_GPU", 0.25))
+    gpu_per_worker = float(os.environ.get("POPGYM_GPU", POPGYM_GPU))
     max_steps = int(os.environ.get("POPGYM_STEPS", 15e6))
     storage_path = os.environ.get("POPGYM_STORAGE", "/tmp/ray_results")
     num_samples = int(os.environ.get("POPGYM_SAMPLES", 1))
 
     # Used for testing
     # Maximum episode length and backprop thru time truncation length
-    bptt_cutoff = int(os.environ.get("POPGYM_BPTT_CUTOFF", 1024))
-    num_workers = int(os.environ.get("POPGYM_WORKERS", 4))
+    bptt_cutoff = int(os.environ.get("POPGYM_BPTT_CUTOFF", POPGYM_BPTT_CUTOFF))
+    num_workers = int(os.environ.get("POPGYM_WORKERS", POPGYM_WORKERS))
     num_minibatch = int(os.environ.get("POPGYM_MINIBATCH", 8))
     num_envs_per_worker = int(os.environ.get("POPGYM_ENVS_PER_WORKER", 16))
 
@@ -53,10 +69,15 @@ def main():
     h = 128
     # Hidden size of memory
     h_memory = 256
-    train_batch_size = bptt_cutoff * max(num_workers, 1) * num_envs_per_worker
+    # h_memory = 512
+    train_batch_mult = bptt_cutoff
+    # train_batch_mult = 1024
+    train_batch_size = train_batch_mult * max(num_workers, 1) * num_envs_per_worker
+    memory_seq_len = 64
 
     def wrap(env: POPGymEnv) -> POPGymEnv:
-        return wrappers.Antialias(wrappers.PreviousAction(env))
+        # return wrappers.Antialias(wrappers.PreviousAction(env))
+        return env
 
     # Register all envs with ray
     envs = popgym.envs.ALL
@@ -113,7 +134,12 @@ def main():
 
     config = {
         # Environments or env names
-        "env": ray.tune.grid_search(env_names),
+       "env": ray.tune.grid_search(env_names),
+        "evaluation_config": {'render_env': True},
+        "evaulation_duration": 10,
+        "evaluation_num_workers": 10,
+        "evaluation_interval": 4,
+        # "env": env_names[0],
         # Should always be torch
         "framework": "torch",
         # Number of rollout workers
@@ -146,9 +172,13 @@ def main():
             "max_seq_len": bptt_cutoff,
             # Custom model class
             "custom_model": ray.tune.grid_search(models),
+            # To give more state info for stacking models
+            # TODO: make configurable
+            # "custom_model": models[0],
             # Config passed to custom model constructor
             # see base_model.py to see how these are used
             "custom_model_config": {
+                "stack_size": memory_seq_len,
                 "preprocessor_input_size": h,
                 "preprocessor": torch.nn.Sequential(
                     torch.nn.Linear(h, h),
@@ -182,13 +212,17 @@ def main():
 
         logging_callbacks = [
             WandbLoggerCallback(
-                project=project_id, entity="prorok-lab", log_config=True
+                project=project_id, 
+                # entity="prorok-lab",
+                log_config=True
             )
         ]
     else:
         logging_callbacks = []
 
-    ray.init()
+    # local_mode = True
+    local_mode = False
+    ray.init(num_cpus=16, num_gpus=1, local_mode=local_mode)
     ray.tune.run(
         "PPO",
         config=config,

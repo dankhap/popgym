@@ -32,6 +32,7 @@ class PositionOnlyCartPole(CartPoleEnv, POPGymEnv):
     def __init__(self, *args, **kwargs):
         self.max_episode_length = kwargs.pop("max_episode_length", 200)
         super().__init__(*args, **kwargs)
+        self.spec.max_episode_steps = self.max_episode_length
 
         # Fix our observation-space (remove 2 velocity components).
         high = np.array(

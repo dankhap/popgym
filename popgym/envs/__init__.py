@@ -67,6 +67,12 @@ from popgym.envs.position_only_cartpole import (
     PositionOnlyCartPoleHard,
     PositionOnlyCartPoleMedium,
 )
+from popgym.envs.lunar_lander_continuous_mask_velocities_multi_discrete import (
+    LunarLanderContinuousMaskVelocitiesMultiDiscrete,
+    LunarLanderContinuousMaskVelocitiesMultiDiscreteEasy,
+    LunarLanderContinuousMaskVelocitiesMultiDiscreteHard,
+    LunarLanderContinuousMaskVelocitiesMultiDiscreteMedium
+)
 from popgym.envs.position_only_pendulum import (
     PositionOnlyPendulum,
     PositionOnlyPendulumEasy,
@@ -135,6 +141,9 @@ CONTROL: Dict[gym.Env, Dict[str, Any]] = {
     },
     VelocityOnlyCartPole: {
         "id": "popgym-VelocityOnlyCartpole-v0",
+    },
+    LunarLanderContinuousMaskVelocitiesMultiDiscrete: {
+        "id": "popgym-LunarLanderContinuousMaskVelocitiesMultiDiscrete-v0",
     }
     # BipedalWalker: {"id": "popgym-BipedalWalker-v0"},
 }
@@ -146,6 +155,9 @@ CONTROL_EASY: Dict[gym.Env, Dict[str, Any]] = {
     },
     VelocityOnlyCartPoleEasy: {
         "id": "popgym-VelocityOnlyCartpoleEasy-v0",
+    },
+    LunarLanderContinuousMaskVelocitiesMultiDiscreteEasy: {
+        "id": "popgym-LunarLanderContinuousMaskVelocitiesMultiDiscreteEasy-v0",
     }
     # BipedalWalkerEasy: {"id": "popgym-BipedalWalkerEasy-v0"},
 }
@@ -157,6 +169,9 @@ CONTROL_MEDIUM: Dict[gym.Env, Dict[str, Any]] = {
     },
     VelocityOnlyCartPoleMedium: {
         "id": "popgym-VelocityOnlyCartpoleMedium-v0",
+    },
+    LunarLanderContinuousMaskVelocitiesMultiDiscreteMedium: {
+        "id": "popgym-LunarLanderContinuousMaskVelocitiesMultiDiscreteMedium-v0",
     }
     # BipedalWalkerMedium: {"id": "popgym-BipedalWalkerMedium-v0"},
 }
@@ -168,6 +183,9 @@ CONTROL_HARD: Dict[gym.Env, Dict[str, Any]] = {
     },
     VelocityOnlyCartPoleHard: {
         "id": "popgym-VelocityOnlyCartpoleHard-v0",
+    },
+    LunarLanderContinuousMaskVelocitiesMultiDiscreteHard: {
+        "id": "popgym-LunarLanderContinuousMaskVelocitiesMultiDiscreteHard-v0",
     }
     # BipedalWalkerHard: {"id": "popgym-BipedalWalkerHard-v0"},
 }
