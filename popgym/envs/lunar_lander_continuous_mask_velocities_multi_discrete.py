@@ -61,11 +61,11 @@ class LunarLanderContinuousMaskVelocitiesMultiDiscreteEasy(LunarLanderContinuous
 
 class LunarLanderContinuousMaskVelocitiesMultiDiscreteMedium(LunarLanderContinuousMaskVelocitiesMultiDiscrete):
     def __init__(self, *args, **kwargs):
-        super().__init__(mask_len=10)
+        super().__init__(mask_len=40)
 
 class LunarLanderContinuousMaskVelocitiesMultiDiscreteHard(LunarLanderContinuousMaskVelocitiesMultiDiscrete):
     def __init__(self, *args, **kwargs):
-        super().__init__(mask_len=30)
+        super().__init__(mask_len=60)
 
 # Short example script to create and run the environment with
 # constant action for 1 simulation second.

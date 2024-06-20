@@ -1,0 +1,53 @@
+{
+	"configurations": [
+		{
+			"name": "test env",
+			"type": "python",
+			"request": "launch",
+			"python": "/home/daniel/anaconda3/envs/pomdp/bin/python",
+			"stopOnEntry": false,
+			"debugOptions": [],
+			"program": "${workspaceFolder}/examples/play_lunarlander.py",
+			"cwd": "${workspaceFolder}",
+			"justMyCode": false
+		},	
+		{
+			"name": "run exp test",
+			"type": "python",
+			"request": "launch",
+			"python": "/home/daniel/anaconda3/envs/pomdp/bin/python",
+			"stopOnEntry": false,
+			"debugOptions": [],
+			"program": "${workspaceFolder}/popgym/baselines/ppo.py",
+			"cwd": "${workspaceFolder}",
+			"env": {
+				"POPGYM_EXPERIMENT": "LunarLanderContinuousMaskVelocitiesMultiDiscreteMedium",
+				"POPGYM_MODELS": "GRU",
+				"POPGYM_WORKERS": "1",
+				"POPGYM_ENVS_PER_WORKER": "1",
+				"POPGYM_MINIBATCH": "1",
+				"POPGYM_GPU": "0.00"
+			},
+			"justMyCode": false
+		},
+		{
+			"name": "run exp full",
+			"type": "python",
+			"request": "launch",
+			"python": "/home/daniel/anaconda3/envs/pomdp/bin/python",
+			"stopOnEntry": false,
+			"debugOptions": [],
+			"program": "${workspaceFolder}/popgym/baselines/ppo.py",
+			"cwd": "${workspaceFolder}",
+			"env": {
+				"POPGYM_EXPERIMENT": "LunarLanderContinuousMaskVelocitiesMultiDiscrete",
+				"POPGYM_MODELS": "GRU,Frameconv,Framestack",
+				"POPGYM_WORKERS": "1",
+				"POPGYM_ENVS_PER_WORKER": "16",
+				"POPGYM_MINIBATCH": "8",
+				"POPGYM_GPU": "1.00"
+			},
+			"justMyCode": false
+		}	
+	]
+}

@@ -30,11 +30,13 @@ from popgym.baselines.ray_models.ray_s4d import S4D
 from popgym.core.env import POPGymEnv
 
 # Defaults
-POPGYM_EXPERIMENT= "LunarLanderContinuousMaskVelocitiesMultiDiscreteMedium,LunarLanderContinuousMaskVelocitiesMultiDiscreteHard"
+# POPGYM_EXPERIMENT= "LunarLanderContinuousMaskVelocitiesMultiDiscreteMedium,LunarLanderContinuousMaskVelocitiesMultiDiscreteHard"
+POPGYM_EXPERIMENT= "LunarLanderContinuousMaskVelocitiesMultiDiscreteHard"
 # POPGYM_MODELS= "DeepLinearAttention"
 # POPGYM_MODELS= "GRU,Frameconv,Framestack"
 POPGYM_BPTT_CUTOFF = 1024
-POPGYM_MODELS= "Frameconv,Framestack"
+# POPGYM_BPTT_CUTOFF = 64
+POPGYM_MODELS= "GRU"
 POPGYM_WORKERS= 1
 POPGYM_GPU= 1.00
 
@@ -71,6 +73,7 @@ def main():
     h_memory = 256
     # h_memory = 512
     train_batch_mult = bptt_cutoff
+    episode_max_length = 1024
     # train_batch_mult = 1024
     train_batch_size = train_batch_mult * max(num_workers, 1) * num_envs_per_worker
     memory_seq_len = 64
@@ -136,8 +139,8 @@ def main():
         # Environments or env names
        "env": ray.tune.grid_search(env_names),
         "evaluation_config": {'render_env': True},
-        "evaulation_duration": 10,
-        "evaluation_num_workers": 10,
+        # "evaulation_duration": 10,
+        # "evaluation_num_workers": 10,
         "evaluation_interval": 4,
         # "env": env_names[0],
         # Should always be torch
